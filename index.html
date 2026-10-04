@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101621">
+  <meta name="description" content="逐行浏览 minWM Wan Action2V 的五条训练路径。">
+  <title>Wan 训练代码巡检</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101621'/%3E%3Cpath d='M14 16l10 32 8-21 8 21 10-32' fill='none' stroke='%2372e0c4' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">W</span><div><strong>Wan 训练代码巡检</strong><small>minWM · 确定性源码路径</small></div></div>
+      <div class="top-actions"><button id="top-prev" class="button subtle" aria-label="上一行">上一行</button><button id="top-next" class="button primary" aria-label="下一行">下一行 <span>→</span></button></div>
+    </header>
+    <nav id="stage-tabs" class="stage-tabs" aria-label="选择训练阶段"></nav>
+    <div class="summary-bar"><div id="stage-summary"></div><div id="trace-progress"></div></div>
+    <main class="workspace">
+      <aside class="explorer panel" aria-label="代码文件树">
+        <div class="panel-head"><div><span class="eyebrow">SOURCE</span><h2>代码目录</h2></div><span id="file-count" class="count"></span></div>
+        <p class="aside-note">点击文件浏览；右侧标记只用于记录，不改变执行路径。</p>
+        <div id="tree" class="tree"></div>
+      </aside>
+      <section class="code-panel panel" aria-label="源码与步进">
+        <div class="code-head"><div class="code-title"><span class="eyebrow" id="mode-label">EXECUTION TRACE</span><h1 id="current-title">载入中…</h1><p id="current-file"></p></div><div class="code-actions"><button id="back-to-trace" class="button subtle hidden">返回追踪</button><button id="code-next" class="button primary">下一行 <span>→</span></button><button id="next-function" class="button subtle">下一个函数</button><button id="skip-function" class="button subtle">Skip 此函数</button></div></div>
+        <div class="code-scroll" id="code-scroll"><div id="code-lines" class="code-lines"></div></div>
+        <div class="code-footer"><span id="position"></span><span>← / → 步进 · Shift + → 下一个函数</span></div>
+      </section>
+      <aside class="detail panel" aria-label="逐行解释">
+        <div class="panel-head"><div><span class="eyebrow">INSPECTOR</span><h2>当前代码</h2></div></div>
+        <div id="detail-content" class="detail-content"></div>
+      </aside>
+    </main>
+  </div>
+  <script src="app.js" defer></script>
+</body>
+</html>
