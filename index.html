@@ -13,7 +13,6 @@
   <div id="app" class="app">
     <header class="topbar">
       <div class="brand"><span class="brand-mark">W</span><div><strong>Wan 训练代码巡检</strong><small>minWM · 确定性源码路径</small></div></div>
-      <div class="top-actions"><button id="top-prev" class="button subtle" aria-label="上一行">上一行</button><button id="top-next" class="button primary" aria-label="下一行">下一行 <span>→</span></button></div>
     </header>
     <nav id="stage-tabs" class="stage-tabs" aria-label="选择训练阶段"></nav>
     <div class="summary-bar"><div id="stage-summary"></div><div id="trace-progress"></div></div>
@@ -24,7 +23,7 @@
         <div id="tree" class="tree"></div>
       </aside>
       <section class="code-panel panel" aria-label="源码与步进">
-        <div class="code-head"><div class="code-title"><span class="eyebrow" id="mode-label">EXECUTION TRACE</span><h1 id="current-title">载入中…</h1><p id="current-file"></p></div><div class="code-actions"><button id="back-to-trace" class="button subtle hidden">返回追踪</button><button id="code-next" class="button primary">下一行 <span>→</span></button><button id="next-function" class="button subtle">下一个函数</button><button id="skip-function" class="button subtle">Skip 此函数</button></div></div>
+        <div class="code-head"><div class="code-title"><span class="eyebrow" id="mode-label">EXECUTION TRACE</span><h1 id="current-title">载入中…</h1><p id="current-file"></p></div><div class="code-actions"><button id="back-to-trace" class="button subtle hidden">返回追踪</button><button id="next-function" class="button subtle">下一个函数</button><button id="skip-function" class="button subtle">Skip 此函数</button></div></div>
         <div class="code-scroll" id="code-scroll"><div id="code-lines" class="code-lines"></div></div>
         <div class="code-footer"><span id="position"></span><span>← / → 步进 · Shift + → 下一个函数</span></div>
       </section>
@@ -33,6 +32,7 @@
         <div id="detail-content" class="detail-content"></div>
       </aside>
     </main>
+    <nav class="step-float" aria-label="代码逐行步进"><button id="top-prev" class="button subtle" aria-label="上一行">← 上一行</button><button id="top-next" class="button primary" aria-label="下一行">下一行 →</button></nav>
   </div>
   <script src="app.js" defer></script>
 </body>

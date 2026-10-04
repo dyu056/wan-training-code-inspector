@@ -95,7 +95,6 @@ function renderDetail(){
   $('detail-content').innerHTML=`<div class="detail-card"><h3>当前位置</h3><span class="step-badge">${escapeHTML(stage.label)}</span><p class="pathline" style="margin-top:12px">${escapeHTML(item.file)}:${item.line}</p><p class="muted">${escapeHTML(item.function)}</p></div><div class="detail-card"><h3>函数调用栈</h3><ul class="stack-list">${stack}</ul>${item.called_at?`<p class="muted">由 ${escapeHTML(item.called_at)} 进入</p>`:''}</div>${call}<div class="detail-card"><h3>这一行在做什么</h3><p>${escapeHTML(item.explanation)}</p></div><div class="detail-card"><h3>源码</h3><code>${escapeHTML(item.code.trim())}</code></div><div class="detail-card"><h3>PyTorch 定义</h3>${item.apis.length?'<ul>'+apiHTML+'</ul>':apiHTML}</div><div class="detail-card"><h3>路径说明</h3><p>下一行会在调用处进入函数，结束后返回调用者。Skip 跳过当前调用或退出当前函数。左侧标记只用于阅读记录。</p></div>`;
   $('top-prev').disabled=eventIndex===0;
   $('top-next').disabled=eventIndex===total-1;
-  $('code-next').disabled=$('top-next').disabled;
   $('next-function').disabled=!stage.events.slice(eventIndex+1).some(event=>event.entry&&event.depth>0);
   $('skip-function').textContent=item.callees.length?'Skip 此调用':'Skip 当前函数';
   $('skip-function').disabled=(item.skip_call_to??(item.depth>0?item.exit_to:null))==null || (item.skip_call_to??item.exit_to)>=total;
@@ -108,7 +107,6 @@ function render(){renderTabs();renderTree();renderCode();renderDetail();}
 
 $('top-prev').onclick=retreat;
 $('top-next').onclick=advance;
-$('code-next').onclick=advance;
 $('next-function').onclick=nextFunction;
 $('skip-function').onclick=skipFunction;
 $('back-to-trace').onclick=()=>{browseFile=null;render();};
