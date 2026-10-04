@@ -111,6 +111,13 @@ $('top-next').onclick=advance;
 $('next-function').onclick=nextFunction;
 $('skip-function').onclick=skipFunction;
 $('back-to-trace').onclick=()=>{browseFile=null;render();};
+function setInspectorOpen(open){
+  $('app').classList.toggle('inspector-collapsed',!open);
+  $('inspector-toggle').textContent=open?'隐藏 INSPECTOR':'显示 INSPECTOR';
+  $('inspector-toggle').setAttribute('aria-expanded',String(open));
+}
+setInspectorOpen(!window.matchMedia('(max-width:1100px)').matches);
+$('inspector-toggle').onclick=()=>setInspectorOpen($('app').classList.contains('inspector-collapsed'));
 document.addEventListener('keydown',event=>{
   if(event.target.closest('button, input, textarea'))return;
   if(event.key==='ArrowRight'){event.preventDefault();event.shiftKey?nextFunction():advance();}
