@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="以 Wan 多卡训练为例，理解 DP、SP、FSDP、HSDP 与逐层权重聚齐。">
+  <title>多卡训练全景图 · DP / SP / FSDP / HSDP</title>
+  <style>
+    :root{font-family:Inter,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;color:#eaf1f5;background:#0b1119;font-size:16px;line-height:1.6}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#183b46 0,transparent 35%),#0b1119}button,select{font:inherit}a{color:#79e0c8}a:hover{color:#b2f6e5}.wrap{max-width:1160px;margin:auto;padding:32px 28px 100px}.eyebrow{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#74d8c0}.hero{padding:32px 0 28px;border-bottom:1px solid #30404d}.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.12;letter-spacing:-.04em;margin:12px 0}.hero p{max-width:850px;color:#b8c9d4;font-size:18px;margin:0}.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}.pill{border:1px solid #36515a;border-radius:999px;padding:5px 12px;font-size:12px;color:#a9c8c8}.pill strong{color:#89ecd2}.section{padding-top:42px}.section h2{font-size:28px;margin:0 0 8px;letter-spacing:-.02em}.section>p{color:#adbfca;margin:0 0 20px;max-width:950px}.card{background:#121e29;border:1px solid #2c4050;border-radius:16px;padding:22px}.lead{font-size:17px;color:#d5e2e9}.four{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.concept h3{margin:0 0 8px;font-size:18px}.concept p{color:#b8c9d4;margin:0 0 10px;font-size:14px}.concept .tag{font-size:12px;font-weight:800;letter-spacing:.08em}.dp .tag{color:#f3c475}.sp .tag{color:#8dc8ff}.fsdp .tag{color:#8ce4c5}.hsdp .tag{color:#d0afff}.formula{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;padding:17px;margin:20px 0 0;border-radius:11px;background:#0d1721;border:1px solid #2e4752;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:16px;text-align:center}.formula b{color:#8debd0}.controls{display:flex;gap:20px;align-items:end;flex-wrap:wrap;margin-bottom:18px}.controls label{font-size:13px;color:#a7bdc8;display:flex;flex-direction:column;gap:7px}.controls select{background:#10212b;color:#eaf1f5;border:1px solid #49626d;border-radius:9px;padding:8px 34px 8px 10px;min-width:150px}.metrics{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 20px}.metric{background:#0c1821;border:1px solid #2b4250;border-radius:10px;padding:10px 14px;min-width:150px}.metric b{display:block;font-size:21px;color:#92ead3;line-height:1.2}.metric span{font-size:12px;color:#a1b7c1}.groups{display:grid;gap:12px}.group{border:1px solid #355364;border-radius:13px;padding:15px;background:#0d1822}.group h3{font-size:14px;margin:0 0 11px;color:#c7d9e2}.ranks{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}.rank{border-radius:9px;background:#1c3441;border:1px solid #406374;padding:11px 6px;text-align:center;min-width:0}.rank b{display:block;font-size:16px}.rank small{display:block;color:#aac4cc;font-size:11px;white-space:nowrap}.legend{color:#9fb6c1;font-size:13px;margin:15px 0 0}.note{border-left:3px solid #77dbc2;padding:9px 14px;background:#142a2b;border-radius:0 8px 8px 0;color:#d7e6e9;margin-top:17px}.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:18px}.flow-item{background:#152633;border:1px solid #395465;border-radius:11px;padding:15px}.flow-item .num{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#78dfc3;color:#102126;font-size:12px;font-weight:900}.flow-item h3{font-size:15px;margin:11px 0 6px}.flow-item p{font-size:12px;color:#b5c8d0;margin:0}.flow-item:not(:last-child)::after{content:"→";float:right;color:#79dfc3;margin-top:-100px;margin-right:-21px;font-size:22px;position:relative;z-index:1}.memory{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.memory .card h3{margin:0 0 5px}.memory .card p{margin:0;color:#b6c9d1;font-size:14px}.memory .card strong{color:#e7d19d}.table-wrap{overflow-x:auto}.table{width:100%;border-collapse:collapse;min-width:650px}.table th{text-align:left;color:#86dec7;font-size:12px;letter-spacing:.06em}.table td,.table th{padding:12px;border-bottom:1px solid #304554;vertical-align:top}.table td{font-size:14px;color:#d1dee4}.table td:first-child{font-weight:800;white-space:nowrap}.sources{font-size:14px;color:#afc4cf}.sources li{margin:8px 0}.foot{border-top:1px solid #30404d;margin-top:45px;padding-top:20px;color:#859ba8;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#e5d7a7;background:#0b1821;border-radius:4px;padding:1px 4px}strong{color:#eaf4f4}@media(max-width:900px){.four{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:1fr}.flow-item:not(:last-child)::after{display:none}.ranks{grid-template-columns:repeat(4,1fr)}.memory{grid-template-columns:1fr}}@media(max-width:600px){.wrap{padding:20px 15px 60px}.four{grid-template-columns:1fr}.ranks{grid-template-columns:repeat(2,1fr)}.hero p{font-size:16px}.section{padding-top:32px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <div class="eyebrow">WAN TRAINING · DISTRIBUTED SYSTEMS</div>
+    <h1>一张图理解多卡训练</h1>
+    <p>DP、SP、FSDP 和 HSDP 不是四种互斥模式。它们分别决定<strong>样本、序列和模型状态</strong>怎样分配给 GPU；HSDP 再决定是否复制多个参数分片组。</p>
+    <div class="pill-row"><span class="pill"><strong>对象</strong>：当前 minWM Wan 训练代码</span><span class="pill"><strong>视角</strong>：8 个 GPU 进程</span><span class="pill"><strong>重点</strong>：权重聚齐的显存与通信</span></div>
+  </header>
+
+  <section class="section" aria-labelledby="ontology"><h2 id="ontology">01 · 四种并行分别切什么</h2><p>先分清“数据”“计算中的激活”和“模型状态”，后面的通信操作才有明确含义。</p>
+    <div class="four">
+      <article class="card concept dp"><div class="tag">DATA AXIS</div><h3>DP · 数据并行</h3><p>不同副本并行读取<strong>不同样本</strong>。同一副本内部的 SP 进程读相同样本索引。</p><div>切的是 <code>batch / samples</code></div></article>
+      <article class="card concept sp"><div class="tag">SEQUENCE AXIS</div><h3>SP · 序列并行</h3><p>一个副本的多张卡合作处理<strong>同一样本的不同序列片段</strong>；attention 中用 all-to-all 交换布局。</p><div>切的是 <code>sequence activations</code></div></article>
+      <article class="card concept fsdp"><div class="tag">PARAMETER AXIS</div><h3>FSDP · 全分片数据并行</h3><p>参数、梯度和优化器状态常驻分片；运行某个 block 时临时聚齐它的权重。</p><div>切的是 <code>model states</code></div></article>
+      <article class="card concept hsdp"><div class="tag">REPLICA AXIS</div><h3>HSDP · 混合分片数据并行</h3><p>建立<strong>多个 FSDP 分片组副本</strong>。每组内分片；组间还要同步梯度。</p><div>增加 <code>shard-group replicas</code></div></article>
+    </div>
+    <div class="formula"><span>总 GPU 数</span><b>=</b><span>DP 副本数</span><b>×</b><span>SP 组大小</span><span>　｜　</span><span>全局 batch</span><b>=</b><span>DP 副本数</span><b>×</b><span>每副本 batch</span></div>
+  </section>
+
+  <section class="section" aria-labelledby="topology"><h2 id="topology">02 · 交互式 8 卡拓扑</h2><p>改变 SP 和 HSDP 分片规模，观察同一批 GPU 如何形成数据副本、序列组和权重分片组。这里固定 <code>tp_size=1</code>、每副本 <code>data.batch_size=2</code>。</p>
+    <div class="card">
+      <div class="controls"><label>序列并行规模 <select id="sp-size"><option value="1">sp_size = 1</option><option value="2">sp_size = 2</option><option value="4" selected>sp_size = 4</option><option value="8">sp_size = 8</option></select></label><label>HSDP：每副本分片所用 DP rank 数 <select id="hsdp-size"></select></label></div>
+      <div class="metrics" id="metrics" aria-live="polite"></div>
+      <div class="groups" id="groups"></div>
+      <p class="legend" id="topology-note"></p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="weight"><h2 id="weight">03 · 一个 Transformer block 的权重聚齐时间线</h2><p>FSDP 的 all-gather 聚齐的是<strong>当前 block 所需权重</strong>；SP 的 all-to-all 交换的是 attention 激活。二者不是同一次通信。</p>
+    <div class="flow">
+      <article class="flow-item"><span class="num">1</span><h3>静置：参数分片</h3><p>每个 rank 常驻持有当前分片组内的一部分权重。优化器状态也随本地分片放置。</p></article>
+      <article class="flow-item"><span class="num">2</span><h3>前向前：all-gather</h3><p>FSDP hook 在分片组内聚齐当前 block 权重；必须有足够空间容纳临时完整权重。</p></article>
+      <article class="flow-item"><span class="num">3</span><h3>前向：本地计算 + SP</h3><p>各 rank 用聚齐的权重计算自己的激活；Wan attention 在 SP 组内执行 all-to-all。</p></article>
+      <article class="flow-item"><span class="num">4</span><h3>释放 / 反向</h3><p><code>reshard_after_forward=True</code> 时，前向后释放完整权重；反向需要时再次聚齐。</p></article>
+      <article class="flow-item"><span class="num">5</span><h3>reduce-scatter + 更新</h3><p>梯度在分片组内汇总并分片；每个 rank 更新自己持有的参数分片。HSDP 还涉及副本间汇总。</p></article>
+    </div>
+    <div class="note">权重 all-gather <strong>不是</strong>把整个模型一次性复制到每卡；这份代码按 Transformer block 调用 <code>fully_shard()</code>。但临时完整 block、通信缓冲区和激活仍会形成显存峰值。SP 的最终 <code>sp_all_gather(x)</code> 也可能让每卡短暂持有完整序列激活。</div>
+  </section>
+
+  <section class="section" aria-labelledby="memory"><h2 id="memory">04 · 两类 all-gather，不要混为一谈</h2><p>“聚齐后内存不够怎么办”必须先问：聚齐的是权重，还是序列激活？</p>
+    <div class="memory">
+      <article class="card"><h3>FSDP 权重聚齐</h3><p>按 block 临时聚齐。<strong>缩小分片边界</strong>和前向后重新分片可压低峰值；计算与预取重叠则可能增加同时存活的缓冲区。</p></article>
+      <article class="card"><h3>SP 激活聚齐</h3><p>若后续层要求完整序列，每卡必须能容纳完整激活。<strong>增大 sp_size 无法消除这一处的完整张量</strong>，需调整 batch、序列长度或后续计算布局。</p></article>
+      <article class="card"><h3>HSDP 的取舍</h3><p>分片组缩小后，权重聚齐只在组内发生；但每个组各有一份参数分片集合，<strong>总模型副本数增加</strong>。</p></article>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="code"><h2 id="code">05 · 源码阅读路线</h2><p>从启动到一次参数更新，按下面顺序阅读；每一步都对应上图中的一种“切分”或“聚齐”。</p>
+    <div class="card table-wrap"><table class="table"><thead><tr><th>顺序</th><th>看什么</th><th>关键问题</th></tr></thead><tbody>
+      <tr><td>1 · 入口</td><td><code>tools/train_mwm.py</code></td><td>每个 rank 如何进入相同的 <code>main()</code>？</td></tr>
+      <tr><td>2 · 进程组</td><td><code>minwm/engine/trainer.py</code> → <code>minwm/distributed/sp/parallel_state.py</code></td><td>哪些 rank 同属 SP、DP 与 FSDP mesh？</td></tr>
+      <tr><td>3 · 数据</td><td><code>minwm/data/samplers/distributed.py</code> → <code>minwm/data/build.py</code></td><td>不同 DP 副本为何读到不同样本？</td></tr>
+      <tr><td>4 · 参数</td><td><code>minwm/engine/trainer.py</code> → <code>minwm/distributed/fsdp.py</code></td><td>哪些 block 被 <code>fully_shard()</code>？</td></tr>
+      <tr><td>5 · 序列</td><td><code>minwm/modeling/wan21/model.py</code> → <code>minwm/modeling/wan21/blocks.py</code></td><td>序列何时切片、attention 何时 all-to-all？</td></tr>
+      <tr><td>6 · 更新</td><td><code>minwm/engine/recipe_base.py</code></td><td>反向与优化器更新何时发生？</td></tr>
+    </tbody></table></div>
+    <ul class="sources"><li>PyTorch 官方参考：<a href="https://docs.pytorch.org/docs/stable/distributed.fsdp.fully_shard.html">FSDP2 fully_shard</a>、<a href="https://docs.pytorch.org/docs/stable/distributed.tensor.html">DeviceMesh / DTensor</a>、<a href="https://docs.pytorch.org/docs/stable/distributed.html">distributed collectives</a>。</li></ul>
+  </section>
+  <footer class="foot">这是一份当前源码的结构说明，不是 GPU 运行记录。图中的 rank 排列以单机 8 进程为例；多机时 rank 组可跨服务器，通信成本取决于实际拓扑。</footer>
+</main>
+<script>
+  const world=8, perReplicaBatch=2;
+  const spSelect=document.getElementById('sp-size');
+  const hsdpSelect=document.getElementById('hsdp-size');
+  const metrics=document.getElementById('metrics');
+  const groups=document.getElementById('groups');
+  const note=document.getElementById('topology-note');
+  function render(){
+    const sp=Number(spSelect.value), dp=world/sp, previous=Number(hsdpSelect.value);
+    hsdpSelect.innerHTML='<option value="0">0 · 全范围 FSDP</option>';
+    for(let shard=1;shard<dp;shard++)if(dp%shard===0)hsdpSelect.innerHTML+=`<option value="${shard}">${shard} · ${dp/shard} 个 HSDP 副本</option>`;
+    hsdpSelect.value=[...hsdpSelect.options].some(option=>Number(option.value)===previous)?String(previous):'0';
+    const hsdp=Number(hsdpSelect.value), shardDp=hsdp||dp, replicas=dp/shardDp, shardRanks=shardDp*sp;
+    metrics.innerHTML=`<div class="metric"><b>${dp}</b><span>DP 数据副本</span></div><div class="metric"><b>${sp}</b><span>每个 SP 组的 GPU</span></div><div class="metric"><b>${shardRanks}</b><span>每个 FSDP 分片组的 GPU</span></div><div class="metric"><b>${replicas}</b><span>权重分片组副本</span></div><div class="metric"><b>${dp*perReplicaBatch}</b><span>示例全局 batch</span></div>`;
+    groups.innerHTML=Array.from({length:dp},(_,d)=>{
+      const first=d*sp, shardGroup=Math.floor(d/shardDp);
+      const cards=Array.from({length:sp},(_,s)=>`<div class="rank"><b>GPU ${first+s}</b><small>SP 片 ${s+1}/${sp}</small></div>`).join('');
+      return `<div class="group"><h3>DP 副本 ${d+1} · 样本批次 ${d+1} · FSDP 分片组 ${shardGroup+1}</h3><div class="ranks">${cards}</div></div>`;
+    }).join('');
+    note.textContent=`本例中，每个 SP 组的 ${sp} 个 rank 读取相同样本索引；${dp} 个 DP 副本读不同样本。FSDP 在每组 ${shardRanks} 个 rank 内聚齐当前 block 的权重${replicas>1?'，并在 '+replicas+' 个 HSDP 副本间同步梯度':''}。`;
+  }
+  spSelect.addEventListener('change',render);hsdpSelect.addEventListener('change',render);render();
+</script>
+</body>
+</html>
