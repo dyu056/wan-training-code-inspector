@@ -68,9 +68,10 @@ function renderTree(){
 function renderCode(){
   const file=browseFile||currentEvent().file;
   const lines=data.files[file]||[];
+  const hiddenHeader=data.hiddenHeaders?.[file]||0;
   const current=browseFile?null:currentEvent().line;
-  $('code-lines').innerHTML=lines.map((line,i)=>{
-    const no=i+1;
+  $('code-lines').innerHTML=lines.slice(hiddenHeader).map((line,i)=>{
+    const no=i+1+hiddenHeader;
     const cls=/^\s*#/.test(line)?'comment':/^\s*(def|class|return|if|elif|else|for|while|with|try|except|finally|import|from)\b/.test(line)?'keyword':'';
     return `<div class="code-line ${no===current?'current':''} ${marked.has(file)?'marked':''}" data-line="${no}"><span class="line-no">${no}</span><span class="line-text ${cls}">${escapeHTML(line)||' '}</span></div>`;
   }).join('');
